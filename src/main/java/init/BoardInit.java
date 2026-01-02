@@ -1,14 +1,12 @@
-//
-// Source code recreated from a .class file by IntelliJ IDEA
-// (powered by FernFlower decompiler)
-//
+
 
 package init;
 
-import domain.Board;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.List;
+
+import domain.Board;
 import service.ConsoleService;
 
 public class BoardInit {
@@ -27,14 +25,14 @@ public class BoardInit {
         if (option == 1) {
             try {
                 List<String> lines = Files.readAllLines(Paths.get("amoba_save.txt"));
-                int rows = Integer.parseInt(((String)lines.get(2)).split(":")[1].trim());
-                int cols = Integer.parseInt(((String)lines.get(3)).split(":")[1].trim());
+                int rows = Integer.parseInt(((String) lines.get(2)).split(":")[1].trim());
+                int cols = Integer.parseInt(((String) lines.get(3)).split(":")[1].trim());
                 Board board = new Board(rows, cols);
 
-                for(int r = 0; r < rows; ++r) {
-                    String line = ((String)lines.get(r + 5)).substring(2).replace(" ", "");
+                for (int r = 0; r < rows; ++r) {
+                    String line = ((String) lines.get(r + 5)).substring(2).replace(" ", "");
 
-                    for(int c = 0; c < cols; ++c) {
+                    for (int c = 0; c < cols; ++c) {
                         board.getCells()[r][c] = line.charAt(c);
                     }
                 }
@@ -52,7 +50,7 @@ public class BoardInit {
                 if (rows < 4 || rows > 25) {
                     this.console.print("Hibás érték! 4 és 25 között adj meg számot!");
                 }
-            } while(rows < 4 || rows > 25);
+            } while (rows < 4 || rows > 25);
 
             int cols;
             do {
@@ -60,7 +58,7 @@ public class BoardInit {
                 if (cols < 4 || cols > 25) {
                     this.console.print("Hibás érték! 4 és 25 között adj meg számot!");
                 }
-            } while(cols < 4 || cols > 25);
+            } while (cols < 4 || cols > 25);
 
             return new Board(rows, cols);
         }

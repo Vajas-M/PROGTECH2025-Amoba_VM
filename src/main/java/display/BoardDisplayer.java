@@ -14,16 +14,16 @@ public class BoardDisplayer {
         char[][] c = board.getCells();
         System.out.print("  ");
 
-        for(int col = 0; col < board.getCols(); ++col) {
-            System.out.print((char)(65 + col) + " ");
+        for (int col = 0; col < board.getCols(); ++col) {
+            System.out.print((char) (65 + col) + " ");
         }
 
         System.out.println();
 
-        for(int r = 0; r < board.getRows(); ++r) {
+        for (int r = 0; r < board.getRows(); ++r) {
             System.out.print(r + 1 + " ");
 
-            for(int col = 0; col < board.getCols(); ++col) {
+            for (int col = 0; col < board.getCols(); ++col) {
                 System.out.print(c[r][col] + " ");
             }
 

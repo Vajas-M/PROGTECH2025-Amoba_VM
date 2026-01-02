@@ -15,9 +15,9 @@ public class AmobaApp {
         Scanner scanner = new Scanner(System.in);
         ConsoleService console = new ConsoleService(scanner);
 
-        console.print("==== AMŐBA JÁTÉK ====");
+        console.print("==== AMŐBA (ÖTÖDÖLŐ) JÁTÉK ====");
 
-        String playerName = console.readString("Add meg a játékos nevét:");
+        String playerName = console.readString("Kérem a játékos nevét:");
         Player player = new Player(playerName, 'X');
         Player ai = new Player("Gép", 'O');
 
