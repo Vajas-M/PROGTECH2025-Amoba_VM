@@ -1,0 +1,8 @@
+Játékos neve: P (X)
+AI neve: AI (O)
+Sorok száma: 3
+Oszlopok száma: 3
+  A B C 
+1 . . . 
+2 . . . 
+3 . . . 
