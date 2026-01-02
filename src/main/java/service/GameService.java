@@ -17,6 +17,7 @@ public class GameService {
     private final BoardDisplayer displayer;
     private final BoardService boardService;
     private final Random random = new Random();
+    private final HighScoreService highScoreService = new HighScoreService();
 
     public GameService(ConsoleService console, BoardDisplayer displayer, BoardService boardService) {
         this.console = console;
@@ -95,12 +96,16 @@ public class GameService {
                 if (isWinner(board, ai.getSymbol())) {
                     displayer.display(board);
                     console.print("A gép nyert!");
+                    highScoreService.recordWin(ai.getName());
                     return;
                 }
 
                 if (boardService.isFull(board)) {
                     displayer.display(board);
                     console.print("Döntetlen! A tábla megtelt.");
+                    highScoreService.recordDraw(player.getName());
+                    highScoreService.recordDraw(ai.getName());
+                    console.print("Aktuális bajnok: " + highScoreService.getChampion());
                     return;
                 }
 
@@ -140,7 +145,7 @@ public class GameService {
             }
 
             if (!hasNeighbor(board, r, c)) {
-                console.print("Csak már lerakott mező mellé tehetsz! Próbáld újra!");
+                console.print("Egy meglévő jel mellé, illetve átlósan tehetsz! Lépj újra!");
                 continue;
             }
 
@@ -148,6 +153,8 @@ public class GameService {
             if (isWinner(board, player.getSymbol())) {
                 displayer.display(board);
                 console.print("Nyertél!");
+                highScoreService.recordWin(player.getName());
+                console.print("Aktuális bajnok: " + highScoreService.getChampion());
                 return;
             }
 
@@ -216,7 +223,7 @@ public class GameService {
         return false;
     }
 
-    // Bekérdezi a mentést – tesztelhető
+    // Mentés kérése
     boolean promptSave(Board board, Player player, Player ai) {
         String ans = console.readString("Szeretnéd menteni? (i/n):");
         if (ans.equalsIgnoreCase("i")) {
@@ -224,8 +231,8 @@ public class GameService {
             console.print("Játék elmentve. Kilépés...");
             return true;
         }
-        console.print("Nincs mentés. Folytatás...");
-        return false;
+        console.print("Nincs mentés. kilépés...");
+        return true;
     }
 
     // Kiírja fájlba a mentést

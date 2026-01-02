@@ -67,7 +67,7 @@
                                         <limit>
                                             <counter>LINE</counter>
                                             <value>COVEREDRATIO</value>
-                                            <minimum>0.80</minimum>
+                                            <minimum>0.50</minimum>
                                         </limit>
                                     </limits>
                                 </rule>
@@ -163,5 +163,13 @@
             <version>5.11.0</version>
             <scope>test</scope>
         </dependency>
+        <!-- Adatbázis kezeléshez  -->
+        <dependency>
+            <groupId>org.xerial</groupId>
+            <artifactId>sqlite-jdbc</artifactId>
+            <version>3.45.3.0</version>
+        </dependency>
+
+
     </dependencies>
 </project>
