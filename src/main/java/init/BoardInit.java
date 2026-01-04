@@ -2,12 +2,12 @@
 
 package init;
 
+import domain.Board;
+import service.ConsoleService;
+
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.List;
-
-import domain.Board;
-import service.ConsoleService;
 
 public class BoardInit {
     private final ConsoleService console;
@@ -21,46 +21,88 @@ public class BoardInit {
     }
 
     public Board initBoard() {
-        int option = this.console.readInt("1 = fájlból betöltés, 2 = új játék létrehozása");
-        if (option == 1) {
-            try {
-                List<String> lines = Files.readAllLines(Paths.get("amoba_save.txt"));
-                int rows = Integer.parseInt(((String) lines.get(2)).split(":")[1].trim());
-                int cols = Integer.parseInt(((String) lines.get(3)).split(":")[1].trim());
-                Board board = new Board(rows, cols);
+        while (true) {
+            int option = console.readInt(
+                    "1 = fájlból betöltés, 2 = új játék, 3 = highscore lista, 0 = kilépés");
 
-                for (int r = 0; r < rows; ++r) {
-                    String line = ((String) lines.get(r + 5)).substring(2).replace(" ", "");
-
-                    for (int c = 0; c < cols; ++c) {
-                        board.getCells()[r][c] = line.charAt(c);
-                    }
+            switch (option) {
+                case 1 -> {
+                    return loadFromFile();
                 }
-
-                this.console.print("Mentett játék betöltve.");
-                return board;
-            } catch (Exception var9) {
-                this.console.print("Hiba a fájl beolvasásakor, üres 10x10 pálya készül.");
-                return new Board(10, 10);
+                case 2 -> {
+                    return createNewBoard();
+                }
+                case 3 -> {
+                    showHighScores();
+                }
+                case 0 -> {
+                    console.print("Kilépés...");
+                    return null;
+                }
+                default -> console.print("Érvénytelen menüpont!");
             }
-        } else {
-            int rows;
-            do {
-                rows = this.console.readInt("Add meg a sorok számát (4-25):");
-                if (rows < 4 || rows > 25) {
-                    this.console.print("Hibás érték! 4 és 25 között adj meg számot!");
-                }
-            } while (rows < 4 || rows > 25);
+        }
+    }
 
-            int cols;
-            do {
-                cols = this.console.readInt("Add meg az oszlopok számát (4-25):");
-                if (cols < 4 || cols > 25) {
-                    this.console.print("Hibás érték! 4 és 25 között adj meg számot!");
-                }
-            } while (cols < 4 || cols > 25);
+    private Board loadFromFile() {
+        try {
+            List<String> lines = Files.readAllLines(Paths.get("amoba_save.txt"));
+            int rows = Integer.parseInt(lines.get(2).split(":")[1].trim());
+            int cols = Integer.parseInt(lines.get(3).split(":")[1].trim());
 
-            return new Board(rows, cols);
+            Board board = new Board(rows, cols);
+
+            for (int r = 0; r < rows; r++) {
+                String line = lines.get(r + 5).substring(2).replace(" ", "");
+                for (int c = 0; c < cols; c++) {
+                    board.getCells()[r][c] = line.charAt(c);
+                }
+            }
+
+            console.print("Mentett játék betöltve.");
+            return board;
+
+        } catch (Exception e) {
+            console.print("Hiba a fájl beolvasásakor, üres 10x10 pálya készül.");
+            return new Board(10, 10);
+        }
+    }
+
+    private Board createNewBoard() {
+        int rows;
+        do {
+            rows = console.readInt("Add meg a sorok számát (4-25):");
+            if (rows < 4 || rows > 25) {
+                console.print("Hibás érték!");
+            }
+        } while (rows < 4 || rows > 25);
+
+        int cols;
+        do {
+            cols = console.readInt("Add meg az oszlopok számát (4-25):");
+            if (cols < 4 || cols > 25) {
+                console.print("Hibás érték!");
+            }
+        } while (cols < 4 || cols > 25);
+
+        return new Board(rows, cols);
+    }
+
+    private void showHighScores() {
+        service.HighScoreService highScoreService = new service.HighScoreService();
+
+        console.print("=== HIGHSCORE LISTA ===");
+
+        List<String> scores = highScoreService.getHighScoreList();
+        if (scores.isEmpty()) {
+            console.print("Még nincs rögzített pontszám.");
+            return;
+        }
+
+        int i = 1;
+        for (String s : scores) {
+            console.print(i + ". " + s);
+            i++;
         }
     }
 }

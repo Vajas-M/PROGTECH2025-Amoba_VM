@@ -1,6 +1,8 @@
 package service;
 
 import java.sql.*;
+import java.util.ArrayList;
+import java.util.List;
 
 public class HighScoreService {
 
@@ -88,5 +90,28 @@ public class HighScoreService {
         }
         return "Nincs adat";
     }
-}
+    public List<String> getHighScoreList() {
+        List<String> list = new ArrayList<>();
 
+        String sql = """
+        SELECT player_name, points
+        FROM scores
+        ORDER BY points DESC
+    """;
+
+        try (Connection conn = DriverManager.getConnection(DB_URL);
+             Statement stmt = conn.createStatement();
+             ResultSet rs = stmt.executeQuery(sql)) {
+
+            while (rs.next()) {
+                String row = rs.getString("player_name") +
+                        " - " + rs.getInt("points") + " pont";
+                list.add(row);
+            }
+        } catch (SQLException e) {
+            list.add("Hiba a toplista lekérésekor.");
+        }
+
+        return list;
+    }
+}

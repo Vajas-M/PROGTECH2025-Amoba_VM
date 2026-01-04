@@ -1,15 +1,15 @@
 package service;
 
+import display.BoardDisplayer;
+import domain.Board;
+import domain.Game;
+import domain.Player;
+
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
-
-import display.BoardDisplayer;
-import domain.Board;
-import domain.Game;
-import domain.Player;
 
 public class GameService {
 
@@ -112,7 +112,7 @@ public class GameService {
                 continue;
             }
 
-            console.print("Következel! (esc = kilépés/mentés)");
+            console.print(player.getName() +  " TE következel! (esc = kilépés/mentés)");
             String inputRow = console.readString("Sor:");
             if (inputRow.equalsIgnoreCase("esc")) {
                 if (promptSave(board, player, ai)) {
@@ -152,7 +152,7 @@ public class GameService {
             board.getCells()[r][c] = player.getSymbol();
             if (isWinner(board, player.getSymbol())) {
                 displayer.display(board);
-                console.print("Nyertél!");
+                console.print(player.getName() + " Nyertél!");
                 highScoreService.recordWin(player.getName());
                 console.print("Aktuális bajnok: " + highScoreService.getChampion());
                 return;
@@ -270,4 +270,20 @@ public class GameService {
             this.col = col;
         }
     }
+    public void showHighScores() {
+        console.print("=== HIGHSCORE LISTA ===");
+
+        List<String> scores = highScoreService.getHighScoreList();
+        if (scores.isEmpty()) {
+            console.print("Még nincs rögzített pontszám.");
+            return;
+        }
+
+        int place = 1;
+        for (String s : scores) {
+            console.print(place + ". " + s);
+            place++;
+        }
+    }
+
 }

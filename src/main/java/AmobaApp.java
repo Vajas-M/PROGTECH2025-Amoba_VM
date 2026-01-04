@@ -1,5 +1,3 @@
-import java.util.Scanner;
-
 import display.BoardDisplayer;
 import domain.Board;
 import domain.Game;
@@ -8,6 +6,8 @@ import init.BoardInit;
 import service.BoardService;
 import service.ConsoleService;
 import service.GameService;
+
+import java.util.Scanner;
 
 public class AmobaApp {
 
@@ -25,6 +25,11 @@ public class AmobaApp {
         // Pálya létrehozás vagy betöltés
         BoardInit boardInit = new BoardInit(console, playerName, "Gép");
         Board board = boardInit.initBoard();
+
+        if (board == null) {
+            console.print("Program leáll.");
+            return;
+        }
 
         BoardDisplayer displayer = new BoardDisplayer(console);
         BoardService boardService = new BoardService();

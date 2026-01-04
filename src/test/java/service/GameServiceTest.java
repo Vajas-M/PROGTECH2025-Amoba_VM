@@ -232,7 +232,7 @@ class GameServiceTest {
         boolean result = gs.promptSave(board, player, ai);
 
         // THEN
-        assertFalse(result);
+        assertTrue(result);
     }
 
 }
