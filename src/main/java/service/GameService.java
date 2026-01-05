@@ -1,15 +1,15 @@
 package service;
 
-import display.BoardDisplayer;
-import domain.Board;
-import domain.Game;
-import domain.Player;
-
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
+
+import display.BoardDisplayer;
+import domain.Board;
+import domain.Game;
+import domain.Player;
 
 public class GameService {
 
@@ -270,6 +270,7 @@ public class GameService {
             this.col = col;
         }
     }
+
     public void showHighScores() {
         console.print("=== HIGHSCORE LISTA ===");
 

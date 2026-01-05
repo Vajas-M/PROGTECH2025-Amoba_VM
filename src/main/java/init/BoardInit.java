@@ -2,12 +2,14 @@
 
 package init;
 
-import domain.Board;
-import service.ConsoleService;
 
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.List;
+
+import domain.Board;
+import domain.Board;
+import service.ConsoleService;
 
 public class BoardInit {
     private final ConsoleService console;

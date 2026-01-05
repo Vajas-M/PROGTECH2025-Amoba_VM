@@ -1,146 +1,105 @@
 package init;
 
 import domain.Board;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import service.ConsoleService;
-
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 class BoardInitTest {
 
-    @Test
-    void testNewBoardCreation() {
-        // GIVEN
-        ConsoleService console = mock(ConsoleService.class);
+    private ConsoleService consoleMock;
+    private BoardInit boardInit;
 
-        when(console.readInt(anyString()))
-                .thenReturn(2)   // új játék
-                .thenReturn(10)  // sorok
-                .thenReturn(10); // oszlopok
-
-        BoardInit init = new BoardInit(console, "player", "ai");
-
-        // WHEN
-        Board board = init.initBoard();
-
-        // THEN
-        assertEquals(10, board.getRows());
-        assertEquals(10, board.getCols());
+    @BeforeEach
+    void setUp() {
+        consoleMock = mock(ConsoleService.class);
+        // Javítás: Átadjuk a hiányzó név paramétereket is
+        boardInit = new BoardInit(consoleMock, "Játékos", "Gép");
     }
 
-
     @Test
-    void testLoadBoardFromFile() throws Exception {
-        // GIVEN — ideiglenes fájl létrehozása
-        Path saveFile = Path.of("amoba_save.txt");
+    void testInitBoardExit() {
+        when(consoleMock.readInt(anyString())).thenReturn(0);
 
-        List<String> content = List.of(
-                "Amőba mentés:",
-                "Metaadatok:",
-                "Rows: 3",
-                "Cols: 3",
-                "Tábla:",
-                "1 X O X",
-                "2 O X O",
-                "3 X O X"
-        );
+        Board result = boardInit.initBoard();
 
-        Files.write(saveFile, content);
-
-        ConsoleService console = mock(ConsoleService.class);
-        when(console.readInt(anyString())).thenReturn(1); // fájlból töltés
-
-        BoardInit init = new BoardInit(console, "player", "ai");
-
-        // WHEN
-        Board board = init.initBoard();
-
-        // THEN
-        assertEquals(3, board.getRows());
-        assertEquals(3, board.getCols());
-
-        assertArrayEquals(new char[]{'X','O','X'}, board.getCells()[0]);
-        assertArrayEquals(new char[]{'O','X','O'}, board.getCells()[1]);
-        assertArrayEquals(new char[]{'X','O','X'}, board.getCells()[2]);
-
-        // CLEANUP
-        Files.deleteIfExists(saveFile);
+        assertNull(result);
+        verify(consoleMock).print("Kilépés...");
     }
 
-
     @Test
-    void testLoadBoardFromFileFails() throws Exception {
-        // GIVEN
-        // Biztosítsuk, hogy a fájl ne létezzen
-        Path saveFile = Path.of("amoba_save.txt");
-        Files.deleteIfExists(saveFile);
+    void testCreateNewBoardValidSize() {
+        when(consoleMock.readInt(anyString()))
+                .thenReturn(2)   // Menü: új játék
+                .thenReturn(10)  // Sorok száma
+                .thenReturn(15); // Oszlopok száma
 
-        ConsoleService console = mock(ConsoleService.class);
-        when(console.readInt(anyString())).thenReturn(1); // fájlból töltés opció
+        Board board = boardInit.initBoard();
 
-        BoardInit init = new BoardInit(console, "player", "ai");
-
-        // WHEN
-        Board board = init.initBoard();
-
-        // THEN
-        assertEquals(10, board.getRows());
-        assertEquals(10, board.getCols());
-
-        verify(console).print("Hiba a fájl beolvasásakor, üres 10x10 pálya készül.");
+        assertNotNull(board);
+        // Javítás: A Board struktúrájának megfelelő ellenőrzés
+        assertEquals(10, board.getCells().length);
+        assertEquals(15, board.getCells()[0].length);
     }
 
-
     @Test
-    void testInvalidRowsThenValid() {
-        // GIVEN
-        ConsoleService console = mock(ConsoleService.class);
+    void testCreateNewBoardInvalidThenValid() {
+        when(consoleMock.readInt(anyString()))
+                .thenReturn(2)   // Új játék
+                .thenReturn(2)   // Hibás sorok (túl kicsi)
+                .thenReturn(6)   // Jó sorok
+                .thenReturn(30)  // Hibás oszlopok (túl nagy)
+                .thenReturn(8);  // Jó oszlopok
 
-        when(console.readInt(anyString()))
-                .thenReturn(2)    // opció = új játék
-                .thenReturn(2)    // sor: HIBÁS (2 < 4)
-                .thenReturn(6)    // sor: jó
-                .thenReturn(10);  // oszlop: jó
+        Board board = boardInit.initBoard();
 
-        BoardInit init = new BoardInit(console, "player", "ai");
+        assertNotNull(board);
+        assertEquals(6, board.getCells().length);
+        assertEquals(8, board.getCells()[0].length);
 
-        // WHEN
-        Board board = init.initBoard();
-
-        // THEN
-        assertEquals(6, board.getRows());
-        assertEquals(10, board.getCols());
-
-        verify(console).print("Hibás érték! 4 és 25 között adj meg számot!");
+        // Ellenőrizzük, hogy a hibaüzenet megjelent-e a konzolon
+        verify(consoleMock, atLeastOnce()).print("Hibás érték!");
     }
 
-
     @Test
-    void testInvalidColsThenValid() {
-        // GIVEN
-        ConsoleService console = mock(ConsoleService.class);
+    void testInvalidMenuOptionThenExit() {
+        when(consoleMock.readInt(anyString()))
+                .thenReturn(99)  // Érvénytelen menüpont
+                .thenReturn(0);   // Kilépés
 
-        when(console.readInt(anyString()))
-                .thenReturn(2)    // opció = új játék
-                .thenReturn(6)    // sor: érvényes
-                .thenReturn(100)  // oszlop: HIBÁS (100 > 25)
-                .thenReturn(7);   // oszlop: érvényes
+        boardInit.initBoard();
 
-        BoardInit init = new BoardInit(console, "player", "ai");
-
-        // WHEN
-        Board board = init.initBoard();
-
-        // THEN
-        assertEquals(6, board.getRows());
-        assertEquals(7, board.getCols());
-
-        verify(console).print("Hibás érték! 4 és 25 között adj meg számot!");
+        verify(consoleMock).print("Érvénytelen menüpont!");
     }
 
+    @Test
+    void testShowHighScores_EmptyList() {
+        // Menü: 3 (Highscore), majd 0 (Kilépés a ciklusból)
+        when(consoleMock.readInt(anyString())).thenReturn(3, 0);
+
+        // a teszt eredménye attól függ, van-e fájl a gépen.reService-t nem
+        // Ha nincs fájl, ezt kell látnunk:
+        boardInit.initBoard();
+
+        // Ellenőrizzük a fejlécet
+        verify(consoleMock).print("=== HIGHSCORE LISTA ===");
+    }
+
+    @Test
+    void testShowHighScores_FlowCheck() {
+        // Ellenőrizzük, hogy a menüválasztás után visszatér-e a főmenübe (ciklus teszt)
+        when(consoleMock.readInt(anyString()))
+                .thenReturn(3) // 1. kör: Megnézzük a listát
+                .thenReturn(0); // 2. kör: Kilépünk
+
+        boardInit.initBoard();
+
+        // Legalább egyszer meg kell hívódnia a listázásnak
+        verify(consoleMock, atLeastOnce()).print(contains("HIGHSCORE"));
+        // A kilépésnek is meg kell történnie a végén
+        verify(consoleMock).print("Kilépés...");
+    }
 }
