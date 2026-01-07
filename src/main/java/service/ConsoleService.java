@@ -14,7 +14,7 @@ public class ConsoleService {
     }
 
     public void print(String message) {
-        LOGGER.info(message);
+       LOGGER.info(message);
         System.out.println(message);
     }
 
